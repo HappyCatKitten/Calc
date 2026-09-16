@@ -9,11 +9,21 @@ A slick native Linux calculator whose arithmetic and scientific functions execut
 ## Features
 
 - Simple charcoal interface with orange accents and optional history.
+- Optional **Catacalc mode**: caterpillar artwork, circular keys, and a botanical history panel; enable it in Options.
 - Comma thousands grouping, editable expressions, parentheses, and normal precedence.
 - Percentages, sign change, squares, roots, reciprocals, and repeated equals.
 - Memory keys, undo/redo, clipboard shortcuts, and always-on-top.
 - Switchable scientific keypad: powers, factorials, π/e, trig, logarithms, degrees/radians.
 - Searchable saved history with reuse, copy, and individual deletion.
+
+<details open>
+<summary>Catacalc mode (current source)</summary>
+
+![Catacalc with circular keys and illustrated history](docs/screenshots/catacalc.png)
+
+The Catacalc theme is available in the current source and is not included in the older v1.0.0 download. Its preference persists between launches. Scientific mode and optional history work in both themes. In Catacalc, right-click the illustration below history to copy or clear all entries.
+
+</details>
 
 <details>
 <summary>Scientific mode</summary>
@@ -29,7 +39,7 @@ A slick native Linux calculator whose arithmetic and scientific functions execut
 
 </details>
 
-The screenshots above are captured from the running native release, not generated mockups.
+The screenshots above are captured from the running native app, not generated mockups. Catacalc uses generated artwork with live QML controls; see the [artwork notes](docs/catacalc-art.md).
 
 ## Install
 
@@ -67,7 +77,7 @@ Built on Linux x86_64 with glibc 2.35. Tested on Pop!_OS 22.04/X11. The `.deb` d
 | Escape | Clear calculation |
 | Delete / Backspace | Clear entry / remove character |
 
-The **☰** menu contains the scientific-mode switch, digit grouping, and always-on-top. Right-click a result or history entry for clipboard actions. Unary scientific keys act on the current operand: enter `30`, then click `sin`.
+The **☰** menu contains Catacalc mode, the scientific-mode switch, digit grouping, and always-on-top. Right-click a result or history entry for clipboard actions. Unary scientific keys act on the current operand: enter `30`, then click `sin`.
 
 `200 + 10%` gives `220`; `200 − 10%` gives `180`; `200 × 10%` gives `20`.
 
@@ -87,6 +97,7 @@ export QT_PREFIX=/path/to/Qt/6.8.3/gcc_64
 ./run.sh
 cargo test --release --locked
 node tests/format.test.mjs
+python3 scripts/catacalc-smoke.py  # requires Xvfb, xdotool and ImageMagick
 python3 scripts/package.py
 ```
 

@@ -28,3 +28,5 @@ jobs:
         run: QT_PREFIX="$QT_ROOT_DIR" ./build.sh
       - name: Native UI smoke check
         run: QT_PREFIX="$QT_ROOT_DIR" python3 scripts/screenshots.py
+      - name: Catacalc UI smoke check
+        run: QT_PREFIX="$QT_ROOT_DIR" python3 scripts/catacalc-smoke.py
