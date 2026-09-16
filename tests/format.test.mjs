@@ -1,0 +1,34 @@
+import { readFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
+const qml=readFileSync(new URL('../qml/Main.qml',import.meta.url),'utf8');
+const prettyBody=qml.match(/function pretty\(raw\) \{([\s\S]*?)\n \}/)[1];
+const normalizeBody=qml.match(/function normalize\(s\) \{([^\n]*)\}/)[1];
+const prefs={numberFormat:0,grouping:true};
+const pretty=new Function('prefs','raw',prettyBody).bind(null,prefs);
+const normalize=new Function('prefs','s',normalizeBody).bind(null,prefs);
+assert.equal(pretty('2469135.78'),'2,469,135.78');
+assert.equal(pretty('-1234567.89'),'-1,234,567.89');
+assert.equal(pretty('0.00001'),'0.00001');
+assert.equal(pretty('1.2e+20'),'1.2e+20');
+assert.equal(pretty('Cannot divide by zero'),'Cannot divide by zero');
+assert.equal(normalize('1,234.56 + 2'),'1234.56+2');
+assert.equal(normalize('1\u202f234.56'),'1234.56');
+prefs.grouping=false;
+assert.equal(pretty('2469135.78'),'2469135.78');
+console.log('8 number-format checks passed');
+let seed=0x123456789abcdn;
+let assertions=0;
+for(let i=0;i<5000;i++) {
+  seed=BigInt.asUintN(64,seed*6364136223846793005n+1n);
+  const whole=seed%1000000000000000n;
+  const fraction=String(seed%1000000n).padStart(6,'0');
+  const negative=i%2===0?'-':'';
+  const raw=negative+whole+'.'+fraction;
+  prefs.grouping=true;
+  const expected=negative+new Intl.NumberFormat('en-US').format(whole)+'.'+fraction;
+  assert.equal(pretty(raw),expected);assertions++;
+  assert.equal(normalize(pretty(raw)),raw);assertions++;
+  prefs.grouping=false;
+  assert.equal(pretty(raw),raw);assertions++;
+}
+console.log(`CAMPAIGN formatting: 5000 cases, ${assertions} assertions passed`);

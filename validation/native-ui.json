@@ -1,0 +1,55 @@
+{
+  "math": [
+    {
+      "expression": "5*-2",
+      "repeat": true,
+      "expected": "20",
+      "actual": "20",
+      "passed": true
+    },
+    {
+      "expression": "5/-2",
+      "repeat": true,
+      "expected": "1.25",
+      "actual": "1.25",
+      "passed": true
+    },
+    {
+      "expression": "sqrt(-4)",
+      "repeat": false,
+      "expected": "Function input is outside its domain",
+      "actual": "Function input is outside its domain",
+      "passed": true
+    },
+    {
+      "expression": "1/0",
+      "repeat": false,
+      "expected": "Cannot divide by zero",
+      "actual": "Cannot divide by zero",
+      "passed": true
+    },
+    {
+      "expression": "sin(30)+sqrt(81)",
+      "repeat": false,
+      "expected": "9.5",
+      "actual": "9.5",
+      "passed": true
+    },
+    {
+      "expression": "1,234,567.89*2",
+      "repeat": false,
+      "expected": "2469135.78",
+      "actual": "2469135.78",
+      "passed": true
+    },
+    {
+      "expression": "200+10%",
+      "repeat": false,
+      "expected": "220",
+      "actual": "220",
+      "passed": true
+    }
+  ],
+  "panel_toggles": 4,
+  "passed": true
+}

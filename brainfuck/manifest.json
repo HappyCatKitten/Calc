@@ -1,0 +1,80 @@
+{
+  "dialect": "arbitrary precision nonnegative integer cells; decrement below zero is an error",
+  "scale": "1000000000000000000000000",
+  "abi": {
+    "aMagnitude": 0,
+    "aNegative": 1,
+    "bMagnitude": 2,
+    "bNegative": 3,
+    "degrees": 4,
+    "error": 5,
+    "resultMagnitude": 6,
+    "resultNegative": 7
+  },
+  "programs": {
+    "add": {
+      "instructions": 3974,
+      "cells": 26
+    },
+    "sub": {
+      "instructions": 4264,
+      "cells": 26
+    },
+    "mul": {
+      "instructions": 3395,
+      "cells": 23
+    },
+    "div": {
+      "instructions": 4291,
+      "cells": 25
+    },
+    "neg": {
+      "instructions": 370,
+      "cells": 11
+    },
+    "abs": {
+      "instructions": 76,
+      "cells": 9
+    },
+    "sqrt": {
+      "instructions": 5078,
+      "cells": 27
+    },
+    "ln": {
+      "instructions": 90072,
+      "cells": 52
+    },
+    "log": {
+      "instructions": 95575,
+      "cells": 56
+    },
+    "sin": {
+      "instructions": 44320,
+      "cells": 48
+    },
+    "cos": {
+      "instructions": 46110,
+      "cells": 48
+    },
+    "tan": {
+      "instructions": 97000,
+      "cells": 54
+    },
+    "pow": {
+      "instructions": 170792,
+      "cells": 73
+    },
+    "factorial": {
+      "instructions": 5333,
+      "cells": 23
+    },
+    "pi": {
+      "instructions": 892,
+      "cells": 9
+    },
+    "e": {
+      "instructions": 884,
+      "cells": 9
+    }
+  }
+}

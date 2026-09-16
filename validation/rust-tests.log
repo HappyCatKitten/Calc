@@ -1,0 +1,80 @@
+   Compiling brainfuck-calculator-core v0.1.0 (<project>)
+    Finished `release` profile [optimized] target(s) in 0.84s
+     Running unittests src/lib.rs (outputs/brainfuck-calculator/target/release/deps/brainfuck_calculator_core-15e8b275e1d9a536)
+
+running 50 tests
+test brainfuck::stress_vm::cell_growth_limits ... ok
+test brainfuck::stress_vm::boundaries_not_optimized_away ... ok
+test brainfuck::stress_vm::fallback_preconditions ... ok
+test brainfuck::stress_vm::io_and_execution_budget ... ok
+test brainfuck::stress_vm::zero_loop_has_no_side_effects ... ok
+test brainfuck::tests::source_changes_change_results ... ok
+test brainfuck::tests::literal_matches_multiplication ... ok
+CAMPAIGN VM affine: 880 cases
+test brainfuck::stress_vm::affine_transfer_variants ... ok
+test brainfuck::tests::no_native_fallback ... ok
+test brainfuck::tests::explicit_underflow ... ok
+test brainfuck::tests::arithmetic ... ok
+test brainfuck::tests::all_sources_are_pure ... ok
+test brainfuck::tests::resource_and_domain_guards ... ok
+test brainfuck::tests::differential_numeric_grid ... ok
+test brainfuck::tests::literal_matches_division ... ok
+test stress_parser::negative_current_operand ... ok
+test stress_parser::repeated_equals_edge_cases ... ok
+test tests::basic ... ok
+test tests::constants_multiply ... ok
+test tests::depth_limit ... ok
+test tests::errors_recover ... ok
+test tests::format ... ok
+test tests::fractional_large_number ... ok
+test tests::grouping_not_in_engine ... ok
+test tests::history ... ok
+test tests::invalid ... ok
+test tests::memory ... ok
+test stress_parser::history_and_undo_are_bounded ... ok
+test tests::percent ... ok
+test tests::repeat_and_continue ... ok
+test tests::reciprocal_operand ... ok
+test tests::repeated_percent ... ok
+test tests::signed_keyboard_operand ... ok
+test tests::unary ... ok
+test brainfuck::tests::scientific ... ok
+test tests::undo_and_clear_entry ... ok
+test tests::scientific ... ok
+CAMPAIGN app action sequences: 300 cases
+test stress_parser::memory_history_undo_sequences ... ok
+test stress_numeric::extreme_trig_inputs_are_not_silently_inaccurate ... ok
+CAMPAIGN boundary values: 27 cases, 0 failures
+test stress_numeric::difficult_boundaries ... ok
+test brainfuck::tests::scientific_range_regressions ... ok
+CAMPAIGN malformed parser: 10000 cases
+test stress_parser::malformed_input_never_panics ... ok
+CAMPAIGN parser expressions: 2000 cases
+test stress_parser::generated_valid_expressions ... ok
+CAMPAIGN VM divmod: 8192 cases
+test brainfuck::stress_vm::exhaustive_small_divmod ... ok
+test brainfuck::tests::literal_matches_add_sub ... ok
+CAMPAIGN VM multiply: 3072 cases
+test brainfuck::stress_vm::multiplication_nonzero_output ... ok
+CAMPAIGN random arithmetic: 12000 cases, 0 failures
+test stress_numeric::randomized_arithmetic ... ok
+CAMPAIGN domains: 603 cases
+test stress_numeric::domain_grid ... ok
+CAMPAIGN powers and factorials: 771 cases, 0 failures
+test stress_numeric::randomized_powers ... ok
+CAMPAIGN scientific randomized: 5389 cases, 0 failures
+test stress_numeric::randomized_scientific ... ok
+
+test result: ok. 50 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.98s
+
+     Running unittests src/bin/bf-calc.rs (outputs/brainfuck-calculator/target/release/deps/bf_calc-3df43e87c792ea50)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests brainfuck_calculator_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

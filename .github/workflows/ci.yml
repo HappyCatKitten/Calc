@@ -1,0 +1,30 @@
+name: Build and test
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Engine and formatting tests
+        run: |
+          cargo test --release --locked
+          node tests/format.test.mjs
+          node brainfuck/generate.mjs
+          git diff --exit-code -- brainfuck
+      - name: Install Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libgl1-mesa-dev libxkbcommon-dev libxcb-cursor0 libxkbcommon-x11-0 xvfb xdotool imagemagick
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          cache: true
+      - name: Build native app
+        run: QT_PREFIX="$QT_ROOT_DIR" ./build.sh
+      - name: Native UI smoke check
+        run: QT_PREFIX="$QT_ROOT_DIR" python3 scripts/screenshots.py

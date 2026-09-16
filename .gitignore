@@ -1,0 +1,7 @@
+/build/
+/target/
+/dist/
+/.package-work/
+*.user
+__pycache__/
+.DS_Store
