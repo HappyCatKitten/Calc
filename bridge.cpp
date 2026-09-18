@@ -15,5 +15,14 @@ public:
  Q_INVOKABLE void copy(const QString& value){QGuiApplication::clipboard()->setText(value);}
 private:void* core;
 };
-int main(int argc,char** argv){QGuiApplication app(argc,argv);app.setApplicationName("Brainfuck Calculator");app.setOrganizationName("HappyCatKitten");app.setApplicationVersion("1.0.0");app.setDesktopFileName("brainfuck-calculator");app.setWindowIcon(QIcon(":/icon.svg"));QSettings current;QSettings legacy("Obsidian","Obsidian Calculator");if(current.allKeys().isEmpty()){for(const auto& key:legacy.allKeys())current.setValue(key,legacy.value(key));}Calculator calculator;QQmlApplicationEngine engine;engine.rootContext()->setContextProperty("calculator",&calculator);engine.load(QUrl("qrc:/qml/Main.qml"));if(engine.rootObjects().isEmpty())return 1;return app.exec();}
+int main(int argc,char** argv){QGuiApplication app(argc,argv);app.setApplicationName("Calc");app.setOrganizationName("HappyCatKitten");app.setApplicationVersion("1.1.0");app.setDesktopFileName("calc");app.setWindowIcon(QIcon(":/icon.svg"));QSettings current;
+// Import the previous app's preferences once, before QML Settings is created.
+if(current.allKeys().isEmpty()){
+ QSettings previous("HappyCatKitten","Brainfuck Calculator");
+ QSettings original("Obsidian","Obsidian Calculator");
+ QSettings& source=previous.allKeys().isEmpty()?original:previous;
+ for(const auto& key:source.allKeys())current.setValue(key,source.value(key));
+ current.sync();
+}
+Calculator calculator;QQmlApplicationEngine engine;engine.rootContext()->setContextProperty("calculator",&calculator);engine.load(QUrl("qrc:/qml/Main.qml"));if(engine.rootObjects().isEmpty())return 1;return app.exec();}
 #include "bridge.moc"

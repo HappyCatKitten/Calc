@@ -6,19 +6,19 @@ root=Path(__file__).resolve().parents[1]
 metadata=json.loads(subprocess.check_output(['cargo','metadata','--locked','--format-version','1'],cwd=root))
 version=next(p['version'] for p in metadata['packages'] if p['id']==metadata['resolve']['root'])
 qt=Path(os.environ.get('QT_PREFIX',str(Path.home()/'.local/share/Qt/6.8.3/gcc_64'))).resolve()
-binary=root/'build/brainfuck-calculator'
+binary=root/'build/calc'
 assert binary.is_file(),'Run ./build.sh first'
 dist=root/'dist';dist.mkdir(exist_ok=True)
-name=f'brainfuck-calculator-{version}-linux-x86_64';bundle=dist/name
+name=f'calc-{version}-linux-x86_64';bundle=dist/name
 if bundle.exists():raise SystemExit(f'{bundle} already exists; use a fresh dist directory to avoid overwriting a release')
 for d in ['lib','qml','plugins','licenses/qt','licenses/rust']:(bundle/d).mkdir(parents=True,exist_ok=True)
-shutil.copy2(binary,bundle/'brainfuck-calculator')
+shutil.copy2(binary,bundle/'calc')
 shutil.copy2(root/'packaging/AppRun',bundle/'AppRun');shutil.copy2(root/'packaging/install-bundle.sh',bundle/'install.sh')
 for f in ['icon.svg','LICENSE','THIRD_PARTY_NOTICES.md']:shutil.copy2(root/f,bundle/f)
 shutil.copytree(root/'licenses',bundle/'licenses',dirs_exist_ok=True)
 (bundle/'VERSION').write_text(version+'\n')
 (bundle/'qt.conf').write_text('[Paths]\nPrefix=.\nLibraries=lib\nPlugins=plugins\nQmlImports=qml\n')
-(bundle/'README.txt').write_text('Brainfuck Calculator '+version+'\nRun ./AppRun, or ./install.sh for a per-user installation.\nQt is bundled. Built on Linux x86_64 with glibc 2.35; tested on Pop!_OS 22.04 X11.\nSource and updates: https://github.com/HappyCatKitten/brainfuck-calculator\n')
+(bundle/'README.txt').write_text('Calc '+version+'\nRun ./AppRun, or ./install.sh for a per-user installation.\nQt is bundled. Built on Linux x86_64 with glibc 2.35; tested on Pop!_OS 22.04 X11.\nSource and updates: https://github.com/HappyCatKitten/Calc\n')
 imports=json.loads(subprocess.check_output([str(qt/'libexec/qmlimportscanner'),'-rootPath',str(root/'qml'),'-importPath',str(qt/'qml')]))
 for mod in imports:
  if not mod.get('path') or not mod.get('relativePath'):continue
@@ -34,7 +34,7 @@ for category in ['platforms','xcbglintegrations','wayland-decoration-client','wa
   if category=='imageformats' and f.name!='libqsvg.so':continue
   shutil.copy2(f,dst/f.name)
 env=dict(os.environ,LD_LIBRARY_PATH=str(qt/'lib'))
-system_paths=set();copied=set();queue=[bundle/'brainfuck-calculator',*bundle.rglob('*.so')]
+system_paths=set();copied=set();queue=[bundle/'calc',*bundle.rglob('*.so')]
 while queue:
  f=queue.pop();output=subprocess.check_output(['ldd',str(f)],env=env,text=True)
  if 'not found' in output:raise RuntimeError(output)
@@ -74,14 +74,14 @@ packages.discard('libc6');dependencies=['libc6 (>= 2.35)',*sorted(packages)]
 archive=dist/(name+'.tar.gz')
 with tarfile.open(archive,'w:gz') as tf:tf.add(bundle,arcname=name)
 debroot=dist/(name+'-deb-root');(debroot/'DEBIAN').mkdir(parents=True);(debroot/'opt').mkdir()
-shutil.copytree(bundle,debroot/'opt/brainfuck-calculator',symlinks=True)
+shutil.copytree(bundle,debroot/'opt/calc',symlinks=True)
 for d in ['usr/bin','usr/share/applications','usr/share/icons/hicolor/scalable/apps']:(debroot/d).mkdir(parents=True)
-(debroot/'usr/bin/brainfuck-calculator').symlink_to('/opt/brainfuck-calculator/AppRun')
-(debroot/'usr/share/applications/brainfuck-calculator.desktop').write_text('[Desktop Entry]\nType=Application\nName=Brainfuck Calculator\nComment=A native calculator with a Brainfuck numeric engine\nExec=/opt/brainfuck-calculator/AppRun\nIcon=brainfuck-calculator\nTerminal=false\nCategories=Utility;Calculator;\nStartupWMClass=Brainfuck Calculator\n')
-shutil.copy2(root/'icon.svg',debroot/'usr/share/icons/hicolor/scalable/apps/brainfuck-calculator.svg')
+(debroot/'usr/bin/calc').symlink_to('/opt/calc/AppRun')
+(debroot/'usr/share/applications/calc.desktop').write_text('[Desktop Entry]\nType=Application\nName=Calc\nComment=A native calculator with a Brainfuck numeric engine\nExec=/opt/calc/AppRun\nIcon=calc\nTerminal=false\nCategories=Utility;Calculator;\nStartupWMClass=Calc\n')
+shutil.copy2(root/'icon.svg',debroot/'usr/share/icons/hicolor/scalable/apps/calc.svg')
 size=sum(p.stat().st_size for p in (debroot/'opt').rglob('*') if p.is_file())//1024
-(debroot/'DEBIAN/control').write_text(f'Package: brainfuck-calculator\nVersion: {version}\nArchitecture: amd64\nMaintainer: HappyCatKitten <1046264+HappyCatKitten@users.noreply.github.com>\nSection: utils\nPriority: optional\nInstalled-Size: {size}\nDepends: {", ".join(dependencies)}\nHomepage: https://github.com/HappyCatKitten/brainfuck-calculator\nDescription: Native calculator with a real Brainfuck numeric engine\n Rust-hosted Brainfuck arithmetic and scientific functions with a Qt/QML UI.\n')
-deb=dist/f'brainfuck-calculator_{version}_amd64.deb'
+(debroot/'DEBIAN/control').write_text(f'Package: calc\nVersion: {version}\nArchitecture: amd64\nMaintainer: HappyCatKitten <1046264+HappyCatKitten@users.noreply.github.com>\nSection: utils\nPriority: optional\nInstalled-Size: {size}\nDepends: {", ".join(dependencies)}\nHomepage: https://github.com/HappyCatKitten/Calc\nDescription: Native calculator with a real Brainfuck numeric engine\n Rust-hosted Brainfuck arithmetic and scientific functions with a Qt/QML UI.\n')
+deb=dist/f'calc_{version}_amd64.deb'
 subprocess.run(['dpkg-deb','--root-owner-group','--build',str(debroot),str(deb)],check=True)
 (dist/'SHA256SUMS').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name+'\n' for p in [archive,deb]))
 print(json.dumps({'archive':str(archive),'deb':str(deb),'qt_libraries':len(copied),'dependencies':dependencies},indent=2))

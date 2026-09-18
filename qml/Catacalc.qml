@@ -88,7 +88,7 @@ Item {
    Rectangle { x:25;y:1;width:19;height:29;radius:14;rotation:33;color:"#9dd948" }
    Rectangle { x:4;y:15;width:16;height:24;radius:12;rotation:-40;color:"#99d63d" }
   }
-  Text { x:host.historyOpen?204:137;y:host.historyOpen?67:73;text:"Catercalc";color:"#fffdf1";font.family:"DejaVu Sans";font.pixelSize:host.historyOpen?40:29;font.bold:true }
+  Text { x:host.historyOpen?204:137;y:host.historyOpen?67:73;text:"Calc";color:"#fffdf1";font.family:"DejaVu Sans";font.pixelSize:host.historyOpen?40:29;font.bold:true }
   Patch { x:host.historyOpen?948:638;y:56;region:Qt.rect(1040,56,82,68);width:host.historyOpen?82:57;height:68 }
   Row { x:host.historyOpen?950:640;y:58;spacing:host.historyOpen?9:6
    Hit { width:host.historyOpen?78:53;height:64;text:"◷";tone:"gold";labelSize:host.historyOpen?43:31;ink:"#123d25";hint:"Show / hide history · Ctrl+H";onClicked:host.toggleHistory() }

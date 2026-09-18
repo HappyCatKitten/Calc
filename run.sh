@@ -6,4 +6,4 @@ export LD_LIBRARY_PATH="$QT_PREFIX/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export QT_QUICK_CONTROLS_STYLE=Basic
 export QT_PLUGIN_PATH="$QT_PREFIX/plugins"
 export QML_IMPORT_PATH="$QT_PREFIX/qml"
-exec ./build/brainfuck-calculator "$@"
+exec ./build/calc "$@"

@@ -4,8 +4,8 @@ import os, subprocess as sp, time, tempfile, json
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 display=next(f':{n}' for n in range(120,150) if not Path(f'/tmp/.X11-unix/X{n}').exists())
-tmp=tempfile.TemporaryDirectory(); env=dict(os.environ,DISPLAY=display,XDG_CONFIG_HOME=tmp.name+'/config',XDG_DATA_HOME=tmp.name+'/data',QT_QPA_PLATFORM='xcb')
-conf=Path(tmp.name+'/config/HappyCatKitten/Brainfuck Calculator.conf');conf.parent.mkdir(parents=True);conf.write_text('[General]\ncatacalc=true\nhistoryOpen=true\nscientific=false\nonTop=false\n')
+tmp=tempfile.TemporaryDirectory(); env=dict(os.environ,DISPLAY=display,XDG_CONFIG_HOME=tmp.name+'/config',XDG_DATA_HOME=tmp.name+'/data',QT_QPA_PLATFORM='xcb',NO_AT_BRIDGE='1',QT_ACCESSIBILITY='0')
+conf=Path(tmp.name+'/config/HappyCatKitten/Calc.conf');conf.parent.mkdir(parents=True);conf.write_text('[General]\ncatacalc=true\nhistoryOpen=true\nscientific=false\nonTop=false\n')
 xv=sp.Popen(['Xvfb',display,'-screen','0','1400x1200x24']);time.sleep(.4)
 log=open(tmp.name+'/log','w');app=None
 try:
@@ -14,12 +14,17 @@ try:
   global app
   app=sp.Popen([os.environ.get('CATACALC_TEST_LAUNCHER',str(root/'run.sh'))],env=env,stdout=log,stderr=log);time.sleep(1)
   if app.poll() is not None:raise RuntimeError(Path(tmp.name+'/log').read_text())
-  w=x('search','--onlyvisible','--name','^Brainfuck Calculator$').splitlines()[-1];x('windowfocus',w);return w
+  for _ in range(60):
+   if app.poll() is not None:raise RuntimeError(Path(tmp.name+'/log').read_text())
+   try:
+    w=x('search','--onlyvisible','--name','^Calc$').splitlines()[-1];x('windowfocus',w);return w
+   except sp.CalledProcessError:time.sleep(.15)
+  raise RuntimeError('Calc did not open a visible window')
  def calc(expr):x('key','ctrl+l');x('type','--clearmodifiers',expr);x('key','Return');time.sleep(.15)
  def capture(name):
   x('mousemove','1300','1100');time.sleep(.25);sp.run(['import','-display',display,'-window',w,str(root/'docs/screenshots'/name)],check=True)
  def click(dx,dy):x('mousemove','--window',w,str(round(dx*.7)),str(round(dy*.7)));x('click','1');time.sleep(.15)
- def history():return json.loads((Path(tmp.name)/'data/brainfuck-calculator/history.json').read_text())
+ def history():return json.loads((Path(tmp.name)/'data/calc/history.json').read_text())
  w=launch();calc('128*4');calc('200+10%');calc('1234567.89*2');assert history()[0]['result']=='2469135.78';capture('catacalc.png')
  click(88,90);capture('catacalc-options.png');x('key','Escape')
  # Filter history, recall the filtered entry and calculate from its result.

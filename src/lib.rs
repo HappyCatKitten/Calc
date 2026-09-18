@@ -42,7 +42,7 @@ fn history_path() -> PathBuf {
         .unwrap_or_else(|| {
             PathBuf::from(std::env::var_os("HOME").unwrap_or_default()).join(".local/share")
         })
-        .join("brainfuck-calculator/history.json")
+        .join("calc/history.json")
 }
 fn format_number(n: f64) -> String {
     if n == 0.0 {
@@ -607,7 +607,11 @@ impl Calculator {
 }
 #[no_mangle]
 pub extern "C" fn calc_new() -> *mut Calculator {
-    let history = std::fs::read(history_path()).or_else(|_| { let old=history_path().parent().unwrap().parent().unwrap().join("obsidian-calculator/history.json"); std::fs::read(old) })
+    let history = std::fs::read(history_path()).or_else(|_| {
+        let base = history_path().parent().unwrap().parent().unwrap().to_path_buf();
+        std::fs::read(base.join("brainfuck-calculator/history.json"))
+            .or_else(|_| std::fs::read(base.join("obsidian-calculator/history.json")))
+    })
         .ok()
         .and_then(|s| serde_json::from_slice(&s).ok())
         .unwrap_or_default();

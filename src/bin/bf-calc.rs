@@ -17,7 +17,7 @@ fn main() {
         .filter(|s| !s.starts_with("--"))
         .map(|s| parse(s))
         .unwrap_or(0.0);
-    match brainfuck_calculator_core::brainfuck::calculate(
+    match calc_core::brainfuck::calculate(
         &args[0],
         a,
         b,

@@ -8,7 +8,7 @@ ApplicationWindow {
  id: win
  width: catacalc ? (historyOpen?933:629) : (historyOpen?660:430); height: catacalc ? (scientific?973:826) : (scientific?744:584)
  minimumWidth: catacalc ? (historyOpen?733:495) : (historyOpen?660:430); minimumHeight: catacalc ? (scientific?765:649) : (scientific?710:550)
- visible: true; title: "Brainfuck Calculator"; color: (win.catacalc?"#fcf9ed":"#202121")
+ visible: true; title: "Calc"; color: (win.catacalc?"#fcf9ed":"#202121")
  flags: Qt.Window | Qt.FramelessWindowHint | (prefs.onTop ? Qt.WindowStaysOnTopHint : 0)
  palette.window: (win.catacalc?"#edf1dc":"#252626"); palette.windowText: (win.catacalc?"#153d25":"#eeeeee"); palette.base: (win.catacalc?"#fffbed":"#303131"); palette.text: (win.catacalc?"#153d25":"#eeeeee"); palette.button: (win.catacalc?"#f6f5e5":"#363737"); palette.buttonText: (win.catacalc?"#153d25":"#eeeeee"); palette.highlight: (win.catacalc?"#92c83e":"#ff9e0b"); palette.highlightedText: (win.catacalc?"#14331b":"#141414")
  property bool catacalc: prefs.catacalc

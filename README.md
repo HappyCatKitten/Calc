@@ -1,10 +1,10 @@
-# Brainfuck Calculator
+# Calc
 
 A slick native Linux calculator whose arithmetic and scientific functions execute **actual Brainfuck programs**. The interface is Qt Quick/QML; Rust provides the expression parser, app state, and an optimizing Brainfuck interpreter.
 
-[Download v1.0.0](https://github.com/HappyCatKitten/brainfuck-calculator/releases/tag/v1.0.0) · [Engine details](brainfuck/README.md) · [Test report](validation/REPORT.md)
+[Download v1.1.0](https://github.com/HappyCatKitten/Calc/releases/tag/v1.1.0) · [Engine details](brainfuck/README.md) · [Test report](validation/REPORT.md)
 
-![Brainfuck Calculator: standard mode and history](docs/screenshots/standard.png)
+![Calc: standard mode and history](docs/screenshots/standard.png)
 
 ## Features
 
@@ -21,7 +21,7 @@ A slick native Linux calculator whose arithmetic and scientific functions execut
 
 ![Catacalc with circular keys and illustrated history](docs/screenshots/catacalc.png)
 
-The Catacalc theme is available in the current source and is not included in the older v1.0.0 download. Its preference persists between launches. Scientific mode and optional history work in both themes. In Catacalc, right-click the illustration below history to copy or clear all entries.
+Calc 1.1.0 includes the Catacalc theme. Its preference persists between launches. Scientific mode and optional history work in both themes. In Catacalc, right-click the illustration below history to copy or clear all entries.
 
 </details>
 
@@ -43,24 +43,24 @@ The screenshots above are captured from the running native app, not generated mo
 
 ## Install
 
-Download the **amd64 `.deb`** or **Linux x86_64 `.tar.gz`** from [Releases](https://github.com/HappyCatKitten/brainfuck-calculator/releases). Qt 6.8.3 is bundled; the development SDK is not required.
+Download the **amd64 `.deb`** or **Linux x86_64 `.tar.gz`** from [Releases](https://github.com/HappyCatKitten/Calc/releases). Qt 6.8.3 is bundled; the development SDK is not required.
 
 Debian/Ubuntu/Pop!_OS:
 
 ```sh
-sudo apt install ./brainfuck-calculator_1.0.0_amd64.deb
+sudo apt install ./calc_1.1.0_amd64.deb
 ```
 
 Standalone archive / per-user installation:
 
 ```sh
-tar -xzf brainfuck-calculator-1.0.0-linux-x86_64.tar.gz
-cd brainfuck-calculator-1.0.0-linux-x86_64
+tar -xzf calc-1.1.0-linux-x86_64.tar.gz
+cd calc-1.1.0-linux-x86_64
 ./AppRun           # run without installing
 ./install.sh       # add to your app menu and ~/.local/bin
 ```
 
-The archive installer uses `~/.local/share/brainfuck-calculator/versions/1.0.0` (or `$XDG_DATA_HOME`) and needs no root access. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
+The archive installer uses `~/.local/share/calc/versions/1.1.0` (or `$XDG_DATA_HOME`) and needs no root access. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
 
 Built on Linux x86_64 with glibc 2.35. Tested on Pop!_OS 22.04/X11. The `.deb` declares its remaining system-library dependencies. Wayland plugins are bundled, but Wayland is not yet verified.
 
@@ -112,6 +112,6 @@ Validation covers **50 Rust test functions**, **48,234 counted campaign cases**,
 
 ## Data and licensing
 
-History: `$XDG_DATA_HOME/brainfuck-calculator/history.json`, normally `~/.local/share/brainfuck-calculator/history.json`. Preferences use Qt Settings under the HappyCatKitten organization. The initial release reads history/preferences from the earlier development name when necessary without deleting them.
+History: `$XDG_DATA_HOME/calc/history.json`, normally `~/.local/share/calc/history.json`. Preferences use Qt Settings under the HappyCatKitten organization. Calc imports history and preferences from Brainfuck Calculator or the earlier Obsidian Calculator when needed. Existing data is preserved.
 
 Project code: [MIT](LICENSE). Bundled Qt/ICU and Rust dependencies retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md). Qt remains dynamically replaceable.
