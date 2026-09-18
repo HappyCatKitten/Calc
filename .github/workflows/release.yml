@@ -1,0 +1,46 @@
+name: Package release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to package
+        required: true
+        default: v1.1.2
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install build and GUI test dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libgl1-mesa-dev libxkbcommon-dev libxcb-cursor0 libxkbcommon-x11-0 xvfb xdotool imagemagick
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          cache: true
+      - name: Build and package tagged source
+        env:
+          QT_PREFIX: ${{ env.QT_ROOT_DIR }}
+        run: |
+          ./build.sh
+          cargo test --release --locked
+          node tests/format.test.mjs
+          python3 scripts/package.py
+      - name: Verify bundled app
+        run: |
+          bundle=$(find dist -maxdepth 2 -name AppRun -type f -print -quit)
+          python3 scripts/screenshots.py "$PWD/$bundle"
+          cd dist && sha256sum -c SHA256SUMS
+      - name: Publish downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          gh release upload "$RELEASE_TAG" dist/*.deb dist/*.tar.gz dist/SHA256SUMS --clobber
+          gh release edit "$RELEASE_TAG" --draft=false --latest
