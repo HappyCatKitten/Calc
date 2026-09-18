@@ -1,6 +1,6 @@
 [package]
 name = "calc-core"
-version = "1.1.0"
+version = "1.1.1"
 edition = "2021"
 license = "MIT"
 description = "A native Qt/QML calculator with a real Brainfuck numeric engine"

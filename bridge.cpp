@@ -15,7 +15,7 @@ public:
  Q_INVOKABLE void copy(const QString& value){QGuiApplication::clipboard()->setText(value);}
 private:void* core;
 };
-int main(int argc,char** argv){QGuiApplication app(argc,argv);app.setApplicationName("Calc");app.setOrganizationName("HappyCatKitten");app.setApplicationVersion("1.1.0");app.setDesktopFileName("calc");app.setWindowIcon(QIcon(":/icon.svg"));QSettings current;
+int main(int argc,char** argv){QGuiApplication app(argc,argv);app.setApplicationName("Calc");app.setOrganizationName("HappyCatKitten");app.setApplicationVersion("1.1.1");app.setDesktopFileName("calc");app.setWindowIcon(QIcon(":/icon.svg"));QSettings current;
 // Import the previous app's preferences once, before QML Settings is created.
 if(current.allKeys().isEmpty()){
  QSettings previous("HappyCatKitten","Brainfuck Calculator");
@@ -24,5 +24,6 @@ if(current.allKeys().isEmpty()){
  for(const auto& key:source.allKeys())current.setValue(key,source.value(key));
  current.sync();
 }
+current.remove("catacalc"); current.sync();
 Calculator calculator;QQmlApplicationEngine engine;engine.rootContext()->setContextProperty("calculator",&calculator);engine.load(QUrl("qrc:/qml/Main.qml"));if(engine.rootObjects().isEmpty())return 1;return app.exec();}
 #include "bridge.moc"

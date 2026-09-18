@@ -2,28 +2,20 @@
 
 A slick native Linux calculator whose arithmetic and scientific functions execute **actual Brainfuck programs**. The interface is Qt Quick/QML; Rust provides the expression parser, app state, and an optimizing Brainfuck interpreter.
 
-[Download v1.1.0](https://github.com/HappyCatKitten/Calc/releases/tag/v1.1.0) · [Engine details](brainfuck/README.md) · [Test report](validation/REPORT.md)
+[Download v1.1.1](https://github.com/HappyCatKitten/Calc/releases/tag/v1.1.1) · [Engine details](brainfuck/README.md) · [Test report](validation/REPORT.md)
 
 ![Calc: standard mode and history](docs/screenshots/standard.png)
 
 ## Features
 
 - Simple charcoal interface with orange accents and optional history.
-- Optional **Catacalc mode**: caterpillar artwork, circular keys, and a botanical history panel; enable it in Options.
 - Comma thousands grouping, editable expressions, parentheses, and normal precedence.
 - Percentages, sign change, squares, roots, reciprocals, and repeated equals.
 - Memory keys, undo/redo, clipboard shortcuts, and always-on-top.
 - Switchable scientific keypad: powers, factorials, π/e, trig, logarithms, degrees/radians.
 - Searchable saved history with reuse, copy, and individual deletion.
 
-<details open>
-<summary>Catacalc mode (current source)</summary>
 
-![Catacalc with circular keys and illustrated history](docs/screenshots/catacalc.png)
-
-Calc 1.1.0 includes the Catacalc theme. Its preference persists between launches. Scientific mode and optional history work in both themes. In Catacalc, right-click the illustration below history to copy or clear all entries.
-
-</details>
 
 <details>
 <summary>Scientific mode</summary>
@@ -39,7 +31,7 @@ Calc 1.1.0 includes the Catacalc theme. Its preference persists between launches
 
 </details>
 
-The screenshots above are captured from the running native app, not generated mockups. Catacalc uses generated artwork with live QML controls; see the [artwork notes](docs/catacalc-art.md).
+The screenshots above are captured from the running native app, not generated mockups.
 
 ## Install
 
@@ -48,19 +40,19 @@ Download the **amd64 `.deb`** or **Linux x86_64 `.tar.gz`** from [Releases](http
 Debian/Ubuntu/Pop!_OS:
 
 ```sh
-sudo apt install ./calc_1.1.0_amd64.deb
+sudo apt install ./calc_1.1.1_amd64.deb
 ```
 
 Standalone archive / per-user installation:
 
 ```sh
-tar -xzf calc-1.1.0-linux-x86_64.tar.gz
-cd calc-1.1.0-linux-x86_64
+tar -xzf calc-1.1.1-linux-x86_64.tar.gz
+cd calc-1.1.1-linux-x86_64
 ./AppRun           # run without installing
 ./install.sh       # add to your app menu and ~/.local/bin
 ```
 
-The archive installer uses `~/.local/share/calc/versions/1.1.0` (or `$XDG_DATA_HOME`) and needs no root access. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
+The archive installer uses `~/.local/share/calc/versions/1.1.1` (or `$XDG_DATA_HOME`) and needs no root access. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
 
 Built on Linux x86_64 with glibc 2.35. Tested on Pop!_OS 22.04/X11. The `.deb` declares its remaining system-library dependencies. Wayland plugins are bundled, but Wayland is not yet verified.
 
@@ -77,7 +69,7 @@ Built on Linux x86_64 with glibc 2.35. Tested on Pop!_OS 22.04/X11. The `.deb` d
 | Escape | Clear calculation |
 | Delete / Backspace | Clear entry / remove character |
 
-The **☰** menu contains Catacalc mode, the scientific-mode switch, digit grouping, and always-on-top. Right-click a result or history entry for clipboard actions. Unary scientific keys act on the current operand: enter `30`, then click `sin`.
+The **☰** menu contains the scientific-mode switch, digit grouping, and always-on-top. Right-click a result or history entry for clipboard actions. Unary scientific keys act on the current operand: enter `30`, then click `sin`.
 
 `200 + 10%` gives `220`; `200 − 10%` gives `180`; `200 × 10%` gives `20`.
 
@@ -97,7 +89,6 @@ export QT_PREFIX=/path/to/Qt/6.8.3/gcc_64
 ./run.sh
 cargo test --release --locked
 node tests/format.test.mjs
-python3 scripts/catacalc-smoke.py  # requires Xvfb, xdotool and ImageMagick
 python3 scripts/package.py
 ```
 
