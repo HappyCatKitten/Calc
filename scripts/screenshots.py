@@ -36,6 +36,15 @@ with tempfile.TemporaryDirectory(prefix='brainfuck-screenshots-') as scratch:
         if launcher.name=='AppRun' and sdk in maps:raise RuntimeError('Bundle used the developer Qt SDK')
         history=json.loads((temp/'data/calc/history.json').read_text())
         assert history[0]['result']=='9.5' and history[1]['result']=='2469135.78'
+        # Letter operators apply to keypad input, with normal text preserved in the editor.
+        x('key','Escape')
+        for letter,expected in [('p','15'),('m','9'),('d','4'),('t','36'),('P','15'),('M','9'),('D','4'),('T','36')]:
+            x('key','Escape');x('type','--clearmodifiers','12'+letter+'3');x('key','Return');time.sleep(.1)
+            actual=json.loads((temp/'data/calc/history.json').read_text())[0]['result']
+            assert actual==expected,(letter,actual,expected)
+        calculate('pi+sqrt(9)')
+        assert json.loads((temp/'data/calc/history.json').read_text())[0]['expression']=='pi+sqrt(9)'
+        print('Eight letter-operator checks and scientific expression editing passed')
         print(json.dumps({'screenshots':[str(out/f) for f in ['standard.png','scientific.png','options.png']],'visible_window':True,'history_verified':True,'developer_qt_sdk_loaded':sdk in maps,'log':(temp/'app.log').read_text()},indent=2))
     finally:
         if app and app.poll() is None:app.terminate();app.wait(timeout=10)

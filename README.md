@@ -60,6 +60,7 @@ Built on Linux x86_64 with glibc 2.35. Tested on Pop!_OS 22.04/X11. The `.deb` d
 
 | Shortcut | Action |
 | --- | --- |
+| P / M / D / T | Add / subtract / divide / multiply (keypad focus) |
 | Enter / = | Calculate; repeat the operation |
 | Ctrl+L | Edit expression |
 | Ctrl+C / Ctrl+V | Copy result / paste expression |

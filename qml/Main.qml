@@ -62,6 +62,7 @@ ApplicationWindow {
    if(event.key===Qt.Key_Return||event.key===Qt.Key_Enter||event.key===Qt.Key_Equal){act("=");event.accepted=true}
    else if(event.key===Qt.Key_Backspace){act("back");event.accepted=true}
    else if(event.key===Qt.Key_Delete){act("CE");event.accepted=true}
+   else if(event.text&&({p:"+",m:"−",d:"÷",t:"×"})[event.text.toLowerCase()]){act(({p:"+",m:"−",d:"÷",t:"×"})[event.text.toLowerCase()]);event.accepted=true}
    else if(event.text&&event.text.length===1&&"0123456789.,+-*/()%^!".includes(event.text)){act(({"-":"−","*":"×","/":"÷",",":"."})[event.text]||event.text);event.accepted=true}
   }
   Rectangle {
@@ -194,7 +195,7 @@ ApplicationWindow {
   id:shortcuts;anchors.centerIn:Overlay.overlay;width:Math.min(390,win.width-20);title:"Keyboard shortcuts";modal:true;standardButtons:Dialog.Close
   background:Rectangle{color:"#292e2e";radius:10;border.color:"#626969"}
   contentItem:ColumnLayout{spacing:14
-   Repeater{model:[{key:"Enter",action:"Calculate / repeat"},{key:"Ctrl+L",action:"Edit expression"},{key:"Ctrl+C / V",action:"Copy / paste"},{key:"Ctrl+Z",action:"Undo"},{key:"Ctrl+Shift+Z",action:"Redo"},{key:"Ctrl+H",action:"Show / hide history"},{key:"Ctrl+Shift+S",action:"Scientific on / off"},{key:"Escape",action:"Clear calculation"},{key:"Delete",action:"Clear current entry"}]
+   Repeater{model:[{key:"P / M / D / T",action:"+ / − / ÷ / ×"},{key:"Enter",action:"Calculate / repeat"},{key:"Ctrl+L",action:"Edit expression"},{key:"Ctrl+C / V",action:"Copy / paste"},{key:"Ctrl+Z",action:"Undo"},{key:"Ctrl+Shift+Z",action:"Redo"},{key:"Ctrl+H",action:"Show / hide history"},{key:"Ctrl+Shift+S",action:"Scientific on / off"},{key:"Escape",action:"Clear calculation"},{key:"Delete",action:"Clear current entry"}]
     delegate:RowLayout{required property var modelData;Layout.fillWidth:true;Text{text:modelData.key;color:"#ffb641";font.pixelSize:14;Layout.preferredWidth:135}Text{text:modelData.action;color:"#f1f4f4";font.pixelSize:14}}
    }
   }
