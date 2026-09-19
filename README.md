@@ -2,7 +2,7 @@
 
 A native Linux calculator built with Rust and Qt Quick/QML. Calculations run only when you press Enter or the equals button; editing keeps the last confirmed answer visible.
 
-[Download v1.2.0](https://github.com/HappyCatKitten/Calc/releases/tag/v1.2.0) · [Test report](validation/REPORT.md)
+[Download v1.2.1](https://github.com/HappyCatKitten/Calc/releases/tag/v1.2.1) · [Test report](validation/REPORT.md)
 
 ![Calc: standard mode and history](docs/screenshots/standard.png)
 
@@ -40,19 +40,19 @@ Download the **amd64 `.deb`** or **Linux x86_64 `.tar.gz`** from [Releases](http
 Debian/Ubuntu/Pop!_OS:
 
 ```sh
-sudo apt install ./calc_1.2.0_amd64.deb
+sudo apt install ./calc_1.2.1_amd64.deb
 ```
 
 Standalone archive / per-user installation:
 
 ```sh
-tar -xzf calc-1.2.0-linux-x86_64.tar.gz
-cd calc-1.2.0-linux-x86_64
+tar -xzf calc-1.2.1-linux-x86_64.tar.gz
+cd calc-1.2.1-linux-x86_64
 ./AppRun           # run without installing
 ./install.sh       # add to your app menu and ~/.local/bin
 ```
 
-The archive installer uses `~/.local/share/calc/versions/1.2.0` (or `$XDG_DATA_HOME`) and needs no root access. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
+The archive installer uses `~/.local/share/calc/versions/1.2.1` (or `$XDG_DATA_HOME`) and needs no root access. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
 
 Built on Linux x86_64 with glibc 2.35. Tested on Pop!_OS 22.04/X11. The `.deb` declares its remaining system-library dependencies. Wayland plugins are bundled, but Wayland is not yet verified.
 

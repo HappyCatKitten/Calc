@@ -14,6 +14,6 @@ public:
  Q_INVOKABLE void copy(const QString& value){QGuiApplication::clipboard()->setText(value);}
 private:void* core;
 };
-int main(int argc,char** argv){QGuiApplication app(argc,argv);app.setApplicationName("Calc");app.setOrganizationName("HappyCatKitten");app.setApplicationVersion("1.2.0");app.setDesktopFileName("calc");app.setWindowIcon(QIcon(":/icon.svg"));
+int main(int argc,char** argv){QGuiApplication app(argc,argv);app.setApplicationName("Calc");app.setOrganizationName("HappyCatKitten");app.setApplicationVersion("1.2.1");app.setDesktopFileName("calc");app.setWindowIcon(QIcon(":/icon.svg"));
 Calculator calculator;QQmlApplicationEngine engine;engine.rootContext()->setContextProperty("calculator",&calculator);engine.load(QUrl("qrc:/qml/Main.qml"));if(engine.rootObjects().isEmpty())return 1;return app.exec();}
 #include "bridge.moc"

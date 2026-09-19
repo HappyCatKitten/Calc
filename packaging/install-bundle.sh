@@ -12,7 +12,7 @@ cat > "$data_root/applications/calc.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Calc
-Comment=Native calculator with scientific functions and history
+Comment=Matrix Multiplier
 Exec="$install_dir/AppRun"
 Icon=io.github.HappyCatKitten.Calc
 Terminal=false

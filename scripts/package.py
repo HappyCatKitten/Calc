@@ -77,7 +77,7 @@ debroot=dist/(name+'-deb-root');(debroot/'DEBIAN').mkdir(parents=True);(debroot/
 shutil.copytree(bundle,debroot/'opt/calc',symlinks=True)
 for d in ['usr/bin','usr/share/applications','usr/share/icons/hicolor/scalable/apps']:(debroot/d).mkdir(parents=True)
 (debroot/'usr/bin/calc').symlink_to('/opt/calc/AppRun')
-(debroot/'usr/share/applications/calc.desktop').write_text('[Desktop Entry]\nType=Application\nName=Calc\nComment=Native calculator with scientific functions and history\nExec=/opt/calc/AppRun\nIcon=io.github.HappyCatKitten.Calc\nTerminal=false\nCategories=Utility;Calculator;\nStartupWMClass=Calc\n')
+(debroot/'usr/share/applications/calc.desktop').write_text('[Desktop Entry]\nType=Application\nName=Calc\nComment=Matrix Multiplier\nExec=/opt/calc/AppRun\nIcon=io.github.HappyCatKitten.Calc\nTerminal=false\nCategories=Utility;Calculator;\nStartupWMClass=Calc\n')
 shutil.copy2(root/'icon.svg',debroot/'usr/share/icons/hicolor/scalable/apps/io.github.HappyCatKitten.Calc.svg')
 size=sum(p.stat().st_size for p in (debroot/'opt').rglob('*') if p.is_file())//1024
 (debroot/'DEBIAN/control').write_text(f'Package: calc\nVersion: {version}\nArchitecture: amd64\nMaintainer: HappyCatKitten <1046264+HappyCatKitten@users.noreply.github.com>\nSection: utils\nPriority: optional\nInstalled-Size: {size}\nDepends: {", ".join(dependencies)}\nHomepage: https://github.com/HappyCatKitten/Calc\nDescription: Native Rust and QML calculator\n Native arithmetic and scientific functions with a Qt/QML UI.\n')
