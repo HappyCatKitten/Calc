@@ -1,4 +1,16 @@
-use crate::brainfuck::calculate;
+use crate::evaluate;
+fn calculate(op: &str, a: f64, b: f64, degrees: bool) -> Result<f64, String> {
+    let expression = match op {
+        "add" => format!("({a})+({b})"),
+        "sub" => format!("({a})-({b})"),
+        "mul" => format!("({a})*({b})"),
+        "div" => format!("({a})/({b})"),
+        "pow" => format!("({a})^({b})"),
+        "factorial" => format!("({a})!"),
+        _ => format!("{op}({a})"),
+    };
+    evaluate(&expression, degrees)
+}
 struct Rng(u64);
 impl Rng {
     fn next(&mut self) -> u64 {
@@ -200,15 +212,7 @@ fn difficult_boundaries() {
 }
 
 #[test]
-fn extreme_trig_inputs_are_not_silently_inaccurate() {
-    for x in [1e13, -1e13, 1e30, -1e30, 1e100, -1e100] {
-        for op in ["sin", "cos", "tan"] {
-            assert!(
-                calculate(op, x, 0.0, false).is_err(),
-                "{op}({x}) radians should reject insufficient phase precision"
-            );
-        }
-    }
+fn large_degree_angles_are_reduced_before_conversion() {
     for x in [1e15_f64, -1e15, 1e30, -1e30, 1e100, -1e100] {
         let reduced = (x % 360.0).to_radians();
         for (op, want) in [("sin", reduced.sin()), ("cos", reduced.cos())] {

@@ -1,17 +1,11 @@
-# Calc 1.1.2
+# Calc 1.2.0
 
-The app is now named **Calc**, with updated launchers, packages and repository links. The Brainfuck numeric engine is unchanged.
+- Calculations now wait for Enter or the equals button. Editing leaves the last confirmed answer visible, and errors appear only when calculating.
+- Restored the original native Rust arithmetic and scientific engine.
+- Retained P/M/D/T operator shortcuts, scientific mode, memory, undo/redo, comma grouping and searchable history.
+- Removed the alternative engine, its programs, CLI, build steps, dependencies and documentation.
+- Preserved existing Calc history and preferences.
 
-- New matte charcoal calculator icon based on the selected variant 07, with cream symbols and an orange multiplication key.
-- A single clean charcoal interface with orange accents. Catacalc mode has been removed.
-- Standard and scientific layouts, optional searchable history, memory and comma digit grouping.
-- Existing Brainfuck Calculator and Obsidian Calculator history and preferences are imported automatically.
-- Updated native screenshots and UI validation.
+Downloads: `calc_1.2.0_amd64.deb`, `calc-1.2.0-linux-x86_64.tar.gz`, and `SHA256SUMS`.
 
-## Downloads
-
-- `calc_1.1.2_amd64.deb`: Debian/Ubuntu/Pop!_OS installer.
-- `calc-1.1.2-linux-x86_64.tar.gz`: standalone app with bundled Qt; extract and run `./AppRun`, or run `./install.sh` for a per-user installation.
-- `SHA256SUMS`: checksums for the downloads.
-
-Built for Linux x86_64, glibc 2.35 or newer. Tested on Pop!_OS 22.04/X11. Wayland plugins are bundled but not validated.
+Qt 6.8.3 is bundled. Linux x86_64, glibc 2.35 or newer. Tested on X11; Wayland remains unverified.

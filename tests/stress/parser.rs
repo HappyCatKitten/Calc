@@ -49,11 +49,14 @@ fn memory_history_undo_sequences() {
             ..Calculator::new()
         };
         c.action(&format!("edit:{i}"));
+        c.action("=");
         c.action("MS");
         c.action("edit:2");
+        c.action("=");
         c.action("M+");
         c.action("C");
         c.action("MR");
+        c.action("=");
         assert_eq!(c.result, (i + 2).to_string());
         c.action("×");
         c.action("3");

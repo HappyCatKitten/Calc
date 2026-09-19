@@ -5,7 +5,7 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 launcher=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else root/'run.sh'
 out=root/'docs/screenshots';out.mkdir(parents=True,exist_ok=True)
-with tempfile.TemporaryDirectory(prefix='brainfuck-screenshots-') as scratch:
+with tempfile.TemporaryDirectory(prefix='calc-screenshots-') as scratch:
     temp=Path(scratch);display=next(f':{n}' for n in range(93,120) if not Path(f'/tmp/.X11-unix/X{n}').exists())
     env=dict(os.environ,DISPLAY=display,XDG_DATA_HOME=str(temp/'data'),XDG_CONFIG_HOME=str(temp/'config'),QT_QPA_PLATFORM='xcb',NO_AT_BRIDGE='1',QT_ACCESSIBILITY='0')
     for key in ['LD_LIBRARY_PATH','QT_PLUGIN_PATH','QML_IMPORT_PATH','QML2_IMPORT_PATH','QT_QPA_PLATFORM_PLUGIN_PATH']:env.pop(key,None)
@@ -44,7 +44,19 @@ with tempfile.TemporaryDirectory(prefix='brainfuck-screenshots-') as scratch:
             assert actual==expected,(letter,actual,expected)
         calculate('pi+sqrt(9)')
         assert json.loads((temp/'data/calc/history.json').read_text())[0]['expression']=='pi+sqrt(9)'
-        print('Eight letter-operator checks and scientific expression editing passed')
+        def displayed_result():
+            x('key','ctrl+c');time.sleep(.08)
+            return run('xclip','-selection','clipboard','-o')
+        x('key','Escape');x('type','--clearmodifiers','12p3')
+        assert displayed_result()=='0', 'Typing evaluated before Enter'
+        x('key','Return');assert displayed_result()=='15'
+        x('type','--clearmodifiers','t2');assert displayed_result()=='15'
+        x('key','Return');assert displayed_result()=='30'
+        x('key','ctrl+l');x('type','--clearmodifiers','1/0');x('key','Tab')
+        assert displayed_result()=='30', 'Expression editing evaluated before Enter'
+        x('key','ctrl+l');x('key','Return');time.sleep(.1)
+        assert 'zero' in displayed_result().lower()
+        print('Letter operators, scientific editing, deferred evaluation and deferred errors passed')
         print(json.dumps({'screenshots':[str(out/f) for f in ['standard.png','scientific.png','options.png']],'visible_window':True,'history_verified':True,'developer_qt_sdk_loaded':sdk in maps,'log':(temp/'app.log').read_text()},indent=2))
     finally:
         if app and app.poll() is None:app.terminate();app.wait(timeout=10)

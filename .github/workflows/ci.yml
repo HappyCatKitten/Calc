@@ -16,10 +16,8 @@ jobs:
         run: |
           cargo test --release --locked
           node tests/format.test.mjs
-          node brainfuck/generate.mjs
-          git diff --exit-code -- brainfuck
       - name: Install Linux build dependencies
-        run: sudo apt-get update && sudo apt-get install -y ninja-build libgl1-mesa-dev libxkbcommon-dev libxcb-cursor0 libxkbcommon-x11-0 xvfb xdotool imagemagick
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libgl1-mesa-dev libxkbcommon-dev libxcb-cursor0 libxkbcommon-x11-0 xvfb xdotool imagemagick xclip
       - uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.3'

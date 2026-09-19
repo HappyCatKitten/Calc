@@ -19,8 +19,5 @@ Qt's matching ICU runtime is included. Copyright and license: `licenses/ICU-73.2
 
 ## Rust dependencies
 
-Dependency versions are locked in `Cargo.lock`. Their license texts are bundled under `licenses/rust/`. They include serde, serde_json, serde_derive, proc-macro2, quote, syn, unicode-ident, memchr, itoa, zmij, num-bigint, num-integer, num-traits and autocfg. They are licensed under MIT and/or Apache-2.0, with unicode-ident additionally using Unicode-3.0.
+Dependency versions are locked in `Cargo.lock`. Their license texts are bundled under `licenses/rust/`. They include serde, serde_json, serde_derive, proc-macro2, quote, syn, unicode-ident, memchr, itoa, zmij. They are licensed under MIT and/or Apache-2.0, with unicode-ident additionally using Unicode-3.0.
 
-## Brainfuck algorithm reference
-
-The fixed divmod routine comes from the Esolang algorithms reference, credited in `brainfuck/README.md`: https://esolangs.org/wiki/Brainfuck_algorithms#Fixed_Version.

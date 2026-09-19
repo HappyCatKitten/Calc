@@ -12,19 +12,12 @@ cat > "$data_root/applications/calc.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Calc
-Comment=A native calculator with a Brainfuck numeric engine
+Comment=Native calculator with scientific functions and history
 Exec="$install_dir/AppRun"
 Icon=io.github.HappyCatKitten.Calc
 Terminal=false
 Categories=Utility;Calculator;
 StartupWMClass=Calc
 DESKTOP
-# Superseded launchers are hidden; their history and settings remain available for migration.
-for old_name in brainfuck-calculator obsidian-calculator; do
-  old_desktop="$data_root/applications/$old_name.desktop"
-  if [[ -f "$old_desktop" ]] && ! grep -q '^Hidden=true$' "$old_desktop"; then
-    printf '\nHidden=true\n' >> "$old_desktop"
-  fi
-done
 if command -v update-desktop-database >/dev/null; then update-desktop-database "$data_root/applications"; fi
 printf 'Installed Calc %s to %s\n' "$version" "$install_dir"

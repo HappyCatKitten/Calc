@@ -1,4 +1,3 @@
-pub mod brainfuck;
 use serde::{Deserialize, Serialize};
 use std::{
     ffi::{c_char, CStr, CString},
@@ -93,9 +92,9 @@ impl Parser {
             if slice.last() == Some(&'%')
                 && !slice.iter().any(|c| matches!(c, '*' | '/' | '^' | '('))
             {
-                b = brainfuck::calculate("mul", b, a, self.degrees)?;
+                b *= a;
             }
-            a = brainfuck::calculate(if op == '+' { "add" } else { "sub" }, a, b, self.degrees)?;
+            a = if op == '+' { a + b } else { a - b };
         }
         Ok(a)
     }
@@ -108,7 +107,14 @@ impl Parser {
             }
             self.pos += 1;
             let b = self.unary()?;
-            a = brainfuck::calculate(if op == '*' { "mul" } else { "div" }, a, b, self.degrees)?;
+            a = if op == '*' {
+                a * b
+            } else {
+                if b == 0.0 {
+                    return Err("Cannot divide by zero".into());
+                }
+                a / b
+            };
         }
         Ok(a)
     }
@@ -118,8 +124,7 @@ impl Parser {
             return Err("Expression too complex".into());
         }
         let r = if self.take('-') {
-            self.unary()
-                .and_then(|v| brainfuck::calculate("neg", v, 0.0, self.degrees))
+            self.unary().map(|v| -v)
         } else if self.take('+') {
             self.unary()
         } else {
@@ -131,7 +136,7 @@ impl Parser {
     fn power(&mut self) -> Result<f64, String> {
         let a = self.postfix()?;
         if self.take('^') {
-            brainfuck::calculate("pow", a, self.unary()?, self.degrees)
+            Ok(a.powf(self.unary()?))
         } else {
             Ok(a)
         }
@@ -140,9 +145,12 @@ impl Parser {
         let mut a = self.atom()?;
         loop {
             if self.take('%') {
-                a = brainfuck::calculate("div", a, 100.0, self.degrees)?
+                a /= 100.0
             } else if self.take('!') {
-                a = brainfuck::calculate("factorial", a, 0.0, self.degrees)?;
+                if a < 0.0 || a.fract() != 0.0 || a > 170.0 {
+                    return Err("Factorial needs an integer from 0 to 170".into());
+                }
+                a = (1..=a as u32).fold(1.0, |v, n| v * n as f64);
             } else {
                 break;
             }
@@ -164,19 +172,31 @@ impl Parser {
             }
             let name: String = self.chars[start..self.pos].iter().collect();
             if name == "pi" {
-                return brainfuck::calculate("pi", 0.0, 0.0, self.degrees);
+                return Ok(std::f64::consts::PI);
             }
             if name == "e" {
-                return brainfuck::calculate("e", 0.0, 0.0, self.degrees);
+                return Ok(std::f64::consts::E);
             }
             if !self.take('(') {
                 return Err("Function needs parentheses".into());
             }
             let v = self.unary_function_argument()?;
+            let angle = if self.degrees {
+                (v % 360.0).to_radians()
+            } else {
+                v
+            };
             return match name.as_str() {
-                "sqrt" | "ln" | "log" | "sin" | "cos" | "tan" | "abs" => {
-                    brainfuck::calculate(&name, v, 0.0, self.degrees)
-                }
+                "sqrt" if v >= 0.0 => Ok(v.sqrt()),
+                "sqrt" => Err("Square root needs a nonnegative number".into()),
+                "ln" if v > 0.0 => Ok(v.ln()),
+                "log" if v > 0.0 => Ok(v.log10()),
+                "ln" | "log" => Err("Logarithm needs a positive number".into()),
+                "sin" => Ok(angle.sin()),
+                "cos" => Ok(angle.cos()),
+                "tan" if angle.cos().abs() > 1e-14 => Ok(angle.tan()),
+                "tan" => Err("Tangent is undefined at this angle".into()),
+                "abs" => Ok(v.abs()),
                 _ => Err("Unknown function".into()),
             };
         }
@@ -295,13 +315,14 @@ impl Calculator {
             self.notice = "Could not save history".into();
         }
     }
-    fn preview(&mut self) {
+    fn mark_edited(&mut self) {
+        // Edits never evaluate; keep the last confirmed answer until equals.
+        if self.error {
+            self.result = "0".into();
+        }
         self.error = false;
         self.done = false;
         self.repeat = None;
-        self.result = evaluate(&self.expression, self.degrees)
-            .map(format_number)
-            .unwrap_or_else(|_| "0".into());
     }
     fn operand_start(&self) -> usize {
         let mut depth = 0;
@@ -354,7 +375,7 @@ impl Calculator {
         if key == "deg" || key == "rad" {
             self.degrees = key == "deg";
             if !self.done {
-                self.preview()
+                self.mark_edited()
             }
             return;
         }
@@ -365,14 +386,15 @@ impl Calculator {
         if matches!(key, "MS" | "M+" | "M-") {
             if !self.error {
                 if let Ok(v) = self.result.parse::<f64>() {
-                    let n = match key {
-                        "M+" => {
-                            brainfuck::calculate("add", self.memory.unwrap_or(0.0), v, self.degrees)
-                        }
-                        "M-" => {
-                            brainfuck::calculate("sub", self.memory.unwrap_or(0.0), v, self.degrees)
-                        }
-                        _ => Ok(v),
+                    let value = match key {
+                        "M+" => self.memory.unwrap_or(0.0) + v,
+                        "M-" => self.memory.unwrap_or(0.0) - v,
+                        _ => v,
+                    };
+                    let n: Result<f64, String> = if value.is_finite() {
+                        Ok(value)
+                    } else {
+                        Err("Result out of range".into())
                     };
                     match n {
                         Ok(value) => self.memory = Some(value),
@@ -406,13 +428,13 @@ impl Calculator {
         {
             if let Some(e) = self.history.get(i) {
                 self.expression = e.expression.clone();
-                self.preview();
+                self.mark_edited();
             }
             return;
         }
         if let Some(s) = key.strip_prefix("edit:") {
             self.expression = s.chars().take(1024).collect();
-            self.preview();
+            self.mark_edited();
             return;
         }
         match key {
@@ -426,11 +448,11 @@ impl Calculator {
             "CE" => {
                 let start = self.operand_start();
                 self.expression.truncate(start);
-                self.preview()
+                self.mark_edited()
             }
             "back" => {
                 self.expression.pop();
-                self.preview();
+                self.mark_edited();
             }
             "MR" => {
                 if let Some(n) = self.memory {
@@ -442,7 +464,7 @@ impl Calculator {
                         self.expression.truncate(start);
                         self.expression.push_str(&s)
                     }
-                    self.preview()
+                    self.mark_edited()
                 }
             }
             "=" => {
@@ -479,14 +501,8 @@ impl Calculator {
                                                 && self.expression[i + c.len_utf8()..]
                                                     .ends_with('%');
                                             let rhs = if relative {
-                                                brainfuck::calculate(
-                                                    "mul",
-                                                    rhs,
-                                                    evaluate(&self.expression[..i], self.degrees)
-                                                        .unwrap_or(1.0),
-                                                    self.degrees,
-                                                )
-                                                .unwrap_or(rhs)
+                                                rhs * evaluate(&self.expression[..i], self.degrees)
+                                                    .unwrap_or(1.0)
                                             } else {
                                                 rhs
                                             };
@@ -536,7 +552,7 @@ impl Calculator {
                 };
                 self.expression.truncate(start);
                 self.expression.push_str(&wrapped);
-                self.preview();
+                self.mark_edited();
             }
             "+" | "−" | "×" | "÷" | "^" => {
                 if self.error {
@@ -600,18 +616,14 @@ impl Calculator {
                     self.expression.push('×');
                 }
                 self.expression.push_str(key);
-                self.preview();
+                self.mark_edited();
             }
         }
     }
 }
 #[no_mangle]
 pub extern "C" fn calc_new() -> *mut Calculator {
-    let history = std::fs::read(history_path()).or_else(|_| {
-        let base = history_path().parent().unwrap().parent().unwrap().to_path_buf();
-        std::fs::read(base.join("brainfuck-calculator/history.json"))
-            .or_else(|_| std::fs::read(base.join("obsidian-calculator/history.json")))
-    })
+    let history = std::fs::read(history_path())
         .ok()
         .and_then(|s| serde_json::from_slice(&s).ok())
         .unwrap_or_default();
@@ -743,7 +755,7 @@ mod tests {
     #[test]
     fn memory() {
         let mut c = calc();
-        for k in ["edit:50", "MS", "edit:25", "M+", "C", "MR"] {
+        for k in ["edit:50", "=", "MS", "edit:25", "=", "M+", "C", "MR", "="] {
             c.action(k)
         }
         assert_eq!(c.result, "75");
@@ -833,3 +845,78 @@ mod stress_numeric;
 #[cfg(test)]
 #[path = "../tests/stress/parser.rs"]
 mod stress_parser;
+
+#[cfg(test)]
+mod deferred_tests {
+    use super::*;
+    fn calculator() -> Calculator {
+        Calculator {
+            transient: true,
+            ..Calculator::new()
+        }
+    }
+    #[test]
+    fn input_waits_for_equals_and_preserves_last_answer() {
+        let mut c = calculator();
+        for key in ["1", "2", "+", "3"] {
+            c.action(key);
+            assert_eq!(c.result, "0");
+            assert!(c.history.is_empty());
+        }
+        c.action("=");
+        assert_eq!(c.result, "15");
+        for key in ["×", "2"] {
+            c.action(key);
+            assert_eq!(c.result, "15");
+        }
+        c.action("=");
+        assert_eq!(c.result, "30");
+        c.action("edit:100/4");
+        assert_eq!(c.result, "30");
+        c.action("=");
+        assert_eq!(c.result, "25");
+    }
+    #[test]
+    fn scientific_keys_and_errors_wait_for_equals() {
+        let mut c = calculator();
+        for key in ["edit:9", "sqrt", "rad", "deg"] {
+            c.action(key);
+            assert_eq!(c.result, "0");
+            assert!(!c.error);
+        }
+        c.action("=");
+        assert_eq!(c.result, "3");
+        c.action("edit:1/0");
+        assert_eq!(c.result, "3");
+        assert!(!c.error);
+        c.action("=");
+        assert!(c.error);
+        c.action("edit:8/2");
+        assert_eq!(c.result, "0");
+        assert!(!c.error);
+        c.action("=");
+        assert_eq!(c.result, "4");
+    }
+    #[test]
+    fn edits_history_reuse_and_memory_do_not_preview() {
+        let mut c = calculator();
+        c.action("edit:50");
+        c.action("=");
+        c.action("MS");
+        c.action("edit:10+5");
+        c.action("back");
+        c.action("CE");
+        assert_eq!(c.result, "50");
+        c.action("C");
+        c.action("MR");
+        assert_eq!(c.expression, "50");
+        assert_eq!(c.result, "0");
+        c.action("=");
+        assert_eq!(c.result, "50");
+        c.action("C");
+        c.action("reuse:0");
+        assert_eq!(c.result, "0");
+        c.action("=");
+        assert_eq!(c.result, "50");
+    }
+}

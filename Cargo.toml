@@ -1,14 +1,12 @@
 [package]
 name = "calc-core"
-version = "1.1.2"
+version = "1.2.0"
 edition = "2021"
 license = "MIT"
-description = "A native Qt/QML calculator with a real Brainfuck numeric engine"
+description = "A native Qt/QML calculator with native Rust arithmetic"
 repository = "https://github.com/HappyCatKitten/Calc"
 [lib]
 crate-type = ["staticlib", "rlib"]
 [dependencies]
-num-bigint = "0.4"
-num-traits = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
