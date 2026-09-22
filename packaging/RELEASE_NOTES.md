@@ -1,8 +1,6 @@
-# Calc 1.2.1
+# Calc 1.2.2
 
-- Updated the application launcher description to “Matrix Multiplier”.
-- Includes the native Rust engine and Enter-only calculation behavior from 1.2.0.
-
-Downloads: `calc_1.2.1_amd64.deb`, `calc-1.2.1-linux-x86_64.tar.gz`, and `SHA256SUMS`.
-
-Qt 6.8.3 is bundled. Linux x86_64, glibc 2.35 or newer.
+- Type calculations in the large main display.
+- Press Enter or equals to show the answer and move the completed formula to the smaller line above.
+- Keep the last completed formula visible while preparing the next calculation.
+- Direct expression editing, scientific functions, and operator shortcuts remain available.

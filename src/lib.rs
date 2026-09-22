@@ -24,7 +24,6 @@ pub struct Calculator {
     degrees: bool,
     error: bool,
     notice: String,
-    #[serde(skip)]
     done: bool,
     #[serde(skip)]
     undo: Vec<Snapshot>,

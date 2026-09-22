@@ -13,7 +13,7 @@ ApplicationWindow {
  palette.window: "#252626"; palette.windowText: "#eeeeee"; palette.base: "#303131"; palette.text: "#eeeeee"; palette.button: "#363737"; palette.buttonText: "#eeeeee"; palette.highlight: "#ff9e0b"; palette.highlightedText: "#141414"
  property bool historyOpen: prefs.historyOpen
  property bool scientific: prefs.scientific
- property var calcState: ({expression:"",result:"0",history:[],memory:null,error:false,notice:""})
+ property var calcState: ({expression:"",result:"0",history:[],memory:null,error:false,done:false,notice:""})
  property string toast: ""
  property string historyQuery: ""
  Settings { id: prefs; property bool historyOpen: true; property bool scientific: false; property bool grouping: true; property bool degrees: true; property bool onTop: false }
@@ -82,21 +82,26 @@ ApplicationWindow {
    id:calcArea;anchors.top:titlebar.bottom;anchors.bottom:parent.bottom;anchors.left:parent.left;width:parent.width-(historyOpen?230:0)
    Item{
     id:display;anchors.top:parent.top;width:parent.width;height:137
+    Text{
+     x:23;y:15;width:parent.width-46;height:38
+     text:calcState.history.length ? expressionText(calcState.history[0].expression)+" =" : ""
+     color:"#969b9b";font.pixelSize:21;horizontalAlignment:Text.AlignRight;verticalAlignment:Text.AlignVCenter;elide:Text.ElideLeft
+     Accessible.name:"Last calculation"
+    }
+    Text{x:8;y:83;text:calcState.memory!==null?"M":"";color:"#ffac29";font.pixelSize:12}
+    TextMetrics{id:displayMetrics;font.family:"DejaVu Sans";font.weight:Font.DemiBold;font.pixelSize:56;text:editor.text}
     TextField{
-     id:editor;x:20;y:15;width:parent.width-40;height:38
-     text:activeFocus ? calcState.expression : expressionText(calcState.expression)
-     color:"#d4d8d8";font.pixelSize:21;selectByMouse:true;placeholderText:"Enter a calculation";placeholderTextColor:"#737979"
+     id:editor;x:20;y:60;width:parent.width-40;height:65
+     text:activeFocus ? calcState.expression : (calcState.done||calcState.error ? pretty(calcState.result) : (expressionText(calcState.expression)||"0"))
+     color:calcState.error?"#ffba7a":"#fafafa";font.family:"DejaVu Sans";font.weight:Font.DemiBold
+     font.pixelSize:calcState.error?22:Math.max(18,Math.min(56,56*(width-16)/Math.max(1,displayMetrics.advanceWidth)))
+     horizontalAlignment:Text.AlignRight;verticalAlignment:Text.AlignVCenter;selectByMouse:true
      background:Rectangle{color:editor.activeFocus?"#2a2c2c":"transparent";radius:4;border.width:editor.activeFocus?1:0;border.color:"#585b5b"}
      onTextEdited:act("edit:"+normalize(text))
      Keys.onReturnPressed:event=>{event.accepted=true;act("=");main.forceActiveFocus()}
      Keys.onEnterPressed:event=>{event.accepted=true;act("=");main.forceActiveFocus()}
      ToolTip.visible:hovered;ToolTip.text:"Edit an expression · Ctrl+L";ToolTip.delay:900
-     Accessible.name:"Expression"
-    }
-    Text{x:23;y:61;text:calcState.memory!==null?"M":"";color:"#ffac29";font.pixelSize:12}
-    Text{
-     x:23;y:60;width:parent.width-46;height:65
-     text:pretty(calcState.result);color:calcState.error?"#ffba7a":"#fafafa";font.family:"DejaVu Sans";font.weight:Font.DemiBold;font.pixelSize:calcState.error?22:56;minimumPixelSize:18;fontSizeMode:Text.Fit;horizontalAlignment:Text.AlignRight;verticalAlignment:Text.AlignVCenter;maximumLineCount:1
+     Accessible.name:"Calculation"
      MouseArea{anchors.fill:parent;acceptedButtons:Qt.RightButton;onClicked:resultMenu.popup()}
     }
    }

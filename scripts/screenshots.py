@@ -49,8 +49,11 @@ with tempfile.TemporaryDirectory(prefix='calc-screenshots-') as scratch:
             return run('xclip','-selection','clipboard','-o')
         x('key','Escape');x('type','--clearmodifiers','12p3')
         assert displayed_result()=='0', 'Typing evaluated before Enter'
+        capture('typing.png')
         x('key','Return');assert displayed_result()=='15'
+        capture('answered.png')
         x('type','--clearmodifiers','t2');assert displayed_result()=='15'
+        capture('continuing.png')
         x('key','Return');assert displayed_result()=='30'
         x('key','ctrl+l');x('type','--clearmodifiers','1/0');x('key','Tab')
         assert displayed_result()=='30', 'Expression editing evaluated before Enter'
