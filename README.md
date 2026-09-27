@@ -1,6 +1,6 @@
 # Calc
 
-A native Linux calculator built with Rust and Qt Quick/QML. Calculations run only when you press Enter or the equals button; the expression appears in the main display while typing, then moves above the answer after calculation.
+A native Linux calculator built with Rust and Qt Quick/QML. Calculations run only when you press Enter or the equals button; the expression appears in the main display while typing, then moves above the answer after calculation. Long formulas scale and wrap within the display. Double-click the display or press Ctrl+L to edit directly.
 
 [Download v1.2.2](https://github.com/HappyCatKitten/Calc/releases/tag/v1.2.2) · [Test report](validation/REPORT.md)
 

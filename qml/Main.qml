@@ -14,6 +14,8 @@ ApplicationWindow {
  property bool historyOpen: prefs.historyOpen
  property bool scientific: prefs.scientific
  property var calcState: ({expression:"",result:"0",history:[],memory:null,error:false,done:false,notice:""})
+ property bool editing: false
+ function beginEditing(){editing=true;editor.forceActiveFocus();editor.selectAll()}
  property string toast: ""
  property string historyQuery: ""
  Settings { id: prefs; property bool historyOpen: true; property bool scientific: false; property bool grouping: true; property bool degrees: true; property bool onTop: false }
@@ -41,7 +43,7 @@ ApplicationWindow {
  Shortcut{sequence:"Ctrl+V";enabled:!editor.activeFocus;onActivated:pasteExpression()}
  Shortcut{sequence:"Ctrl+Z";enabled:!editor.activeFocus;onActivated:act("undo")}
  Shortcut{sequence:"Ctrl+Shift+Z";enabled:!editor.activeFocus;onActivated:act("redo")}
- Shortcut{sequence:"Ctrl+L";onActivated:{editor.forceActiveFocus();editor.selectAll()}}
+ Shortcut{sequence:"Ctrl+L";onActivated:beginEditing()}
  Shortcut{sequence:"Escape";onActivated:{settings.close();act("C");main.forceActiveFocus()}}
  component Key: Button {
   id: key
@@ -89,20 +91,29 @@ ApplicationWindow {
      Accessible.name:"Last calculation"
     }
     Text{x:8;y:83;text:calcState.memory!==null?"M":"";color:"#ffac29";font.pixelSize:12}
-    TextMetrics{id:displayMetrics;font.family:"DejaVu Sans";font.weight:Font.DemiBold;font.pixelSize:56;text:editor.text}
-    TextField{
-     id:editor;x:20;y:60;width:parent.width-40;height:65
-     text:activeFocus ? calcState.expression : (calcState.done||calcState.error ? pretty(calcState.result) : (expressionText(calcState.expression)||"0"))
+    Text{
+     id:mainDisplay;x:23;y:54;width:parent.width-46;height:78;visible:!win.editing
+     text:calcState.done||calcState.error ? pretty(calcState.result) : (expressionText(calcState.expression)||"0")
      color:calcState.error?"#ffba7a":"#fafafa";font.family:"DejaVu Sans";font.weight:Font.DemiBold
-     font.pixelSize:calcState.error?22:Math.max(18,Math.min(56,56*(width-16)/Math.max(1,displayMetrics.advanceWidth)))
+     font.pixelSize:calcState.error?22:56;minimumPixelSize:12;fontSizeMode:Text.Fit
+     wrapMode:Text.WrapAnywhere;maximumLineCount:2;elide:Text.ElideLeft
+     horizontalAlignment:Text.AlignRight;verticalAlignment:Text.AlignVCenter
+     Accessible.name:"Calculation";Accessible.description:text
+     MouseArea{anchors.fill:parent;acceptedButtons:Qt.LeftButton|Qt.RightButton;onClicked:mouse=>{if(mouse.button===Qt.RightButton)resultMenu.popup();else main.forceActiveFocus()};onDoubleClicked:win.beginEditing()}
+    }
+    TextMetrics{id:displayMetrics;font.family:"DejaVu Sans";font.weight:Font.DemiBold;font.pixelSize:56;text:editor.text}
+    TextInput{
+     id:editor;x:23;y:60;width:parent.width-46;height:65;visible:win.editing;clip:true
+     text:calcState.expression
+     color:"#fafafa";font.family:"DejaVu Sans";font.weight:Font.DemiBold
+     font.pixelSize:Math.max(12,Math.min(56,56*(width-4)/Math.max(1,displayMetrics.advanceWidth)))
      horizontalAlignment:Text.AlignRight;verticalAlignment:Text.AlignVCenter;selectByMouse:true
-     background:Rectangle{color:editor.activeFocus?"#2a2c2c":"transparent";radius:4;border.width:editor.activeFocus?1:0;border.color:"#585b5b"}
+     selectionColor:"#ff9e0b";selectedTextColor:"#141414"
+     onActiveFocusChanged:if(!activeFocus)win.editing=false
      onTextEdited:act("edit:"+normalize(text))
      Keys.onReturnPressed:event=>{event.accepted=true;act("=");main.forceActiveFocus()}
      Keys.onEnterPressed:event=>{event.accepted=true;act("=");main.forceActiveFocus()}
-     ToolTip.visible:hovered;ToolTip.text:"Edit an expression · Ctrl+L";ToolTip.delay:900
-     Accessible.name:"Calculation"
-     MouseArea{anchors.fill:parent;acceptedButtons:Qt.RightButton;onClicked:resultMenu.popup()}
+     Accessible.name:"Edit calculation"
     }
    }
    RowLayout{

@@ -59,6 +59,8 @@ with tempfile.TemporaryDirectory(prefix='calc-screenshots-') as scratch:
         assert displayed_result()=='30', 'Expression editing evaluated before Enter'
         x('key','ctrl+l');x('key','Return');time.sleep(.1)
         assert 'zero' in displayed_result().lower()
+        x('key','Escape');x('type','--clearmodifiers','123456789.12345+987654321.98765');capture('long-expression.png')
+        x('key','ctrl+l');capture('long-editing.png');x('key','Tab')
         print('Letter operators, scientific editing, deferred evaluation and deferred errors passed')
         print(json.dumps({'screenshots':[str(out/f) for f in ['standard.png','scientific.png','options.png']],'visible_window':True,'history_verified':True,'developer_qt_sdk_loaded':sdk in maps,'log':(temp/'app.log').read_text()},indent=2))
     finally:
