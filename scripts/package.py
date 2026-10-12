@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """Build a relocatable Qt runtime archive and a Debian package from the release build."""
-import json,os,re,shutil,subprocess,tarfile,hashlib
+import json,os,re,shutil,subprocess,tarfile,hashlib,platform
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 metadata=json.loads(subprocess.check_output(['cargo','metadata','--locked','--format-version','1'],cwd=root))
 version=next(p['version'] for p in metadata['packages'] if p['id']==metadata['resolve']['root'])
 qt=Path(os.environ.get('QT_PREFIX',str(Path.home()/'.local/share/Qt/6.8.3/gcc_64'))).resolve()
+# Support both the upstream Qt SDK and Ubuntu's multiarch Qt layout.
+qt_lib=next((p for p in [qt/'lib',qt/'lib/x86_64-linux-gnu'] if list(p.glob('libQt6Core.so*'))),qt/'lib')
+qt_qml=next((p for p in [qt/'qml',qt/'lib/x86_64-linux-gnu/qt6/qml'] if p.is_dir()),qt/'qml')
+qt_plugins=next((p for p in [qt/'plugins',qt/'lib/x86_64-linux-gnu/qt6/plugins'] if p.is_dir()),qt/'plugins')
+qt_libexec=next((p for p in [qt/'libexec',qt/'lib/qt6/libexec'] if (p/'qmlimportscanner').is_file()),qt/'libexec')
 binary=root/'build/calc'
 assert binary.is_file(),'Run ./build.sh first'
 dist=root/'dist';dist.mkdir(exist_ok=True)
@@ -18,22 +23,22 @@ for f in ['icon.svg','LICENSE','THIRD_PARTY_NOTICES.md']:shutil.copy2(root/f,bun
 shutil.copytree(root/'licenses',bundle/'licenses',dirs_exist_ok=True)
 (bundle/'VERSION').write_text(version+'\n')
 (bundle/'qt.conf').write_text('[Paths]\nPrefix=.\nLibraries=lib\nPlugins=plugins\nQmlImports=qml\n')
-(bundle/'README.txt').write_text('Calc '+version+'\nRun ./AppRun, or ./install.sh for a per-user installation.\nQt is bundled. Built on Linux x86_64 with glibc 2.35; tested on Pop!_OS 22.04 X11.\nSource and updates: https://github.com/HappyCatKitten/Calc\n')
-imports=json.loads(subprocess.check_output([str(qt/'libexec/qmlimportscanner'),'-rootPath',str(root/'qml'),'-importPath',str(qt/'qml')]))
+(bundle/'README.txt').write_text('Calc '+version+'\nRun ./AppRun, or ./install.sh for a per-user installation.\nQt is bundled. Built on '+platform.freedesktop_os_release().get('PRETTY_NAME','Linux')+' with glibc '+platform.libc_ver()[1]+'.\nSource and updates: https://github.com/HappyCatKitten/Calc\n')
+imports=json.loads(subprocess.check_output([str(qt_libexec/'qmlimportscanner'),'-rootPath',str(root/'qml'),'-importPath',str(qt_qml)]))
 for mod in imports:
  if not mod.get('path') or not mod.get('relativePath'):continue
  src=Path(mod['path']);dst=bundle/'qml'/mod['relativePath'];dst.mkdir(parents=True,exist_ok=True)
  for f in src.iterdir():
   if f.is_file() and not f.name.endswith(('.qmltypes','.prl','.a')):shutil.copy2(f,dst/f.name)
 for category in ['platforms','xcbglintegrations','wayland-decoration-client','wayland-graphics-integration-client','wayland-shell-integration','platforminputcontexts','imageformats']:
- src=qt/'plugins'/category
+ src=qt_plugins/category
  if not src.exists():continue
  dst=bundle/'plugins'/category;dst.mkdir(parents=True,exist_ok=True)
  for f in src.glob('*.so'):
-  if category=='platforms' and f.name not in ['libqxcb.so','libqwayland-egl.so','libqwayland-generic.so','libqoffscreen.so']:continue
+  if category=='platforms' and f.name not in ['libqxcb.so','libqwayland.so','libqwayland-egl.so','libqwayland-generic.so','libqoffscreen.so']:continue
   if category=='imageformats' and f.name!='libqsvg.so':continue
   shutil.copy2(f,dst/f.name)
-env=dict(os.environ,LD_LIBRARY_PATH=str(qt/'lib'))
+env=dict(os.environ,LD_LIBRARY_PATH=str(qt_lib))
 system_paths=set();copied=set();queue=[bundle/'calc',*bundle.rglob('*.so')]
 while queue:
  f=queue.pop();output=subprocess.check_output(['ldd',str(f)],env=env,text=True)
@@ -69,15 +74,15 @@ for value in system_paths:
   result=subprocess.run(['dpkg-query','-S',p],capture_output=True,text=True)
   if result.returncode==0:
    package=result.stdout.split(': ')[0].split(':')[0];packages.add(package);break
-packages.discard('libc6');dependencies=['libc6 (>= 2.35)',*sorted(packages)]
-(bundle/'runtime-manifest.json').write_text(json.dumps({'version':version,'qt':'6.8.3','bundled_libraries':sorted(copied),'external_packages':dependencies},indent=2)+'\n')
+packages.discard('libc6');dependencies=[f'libc6 (>= {platform.libc_ver()[1]})',*sorted(packages)]
+(bundle/'runtime-manifest.json').write_text(json.dumps({'version':version,'qt':subprocess.check_output([str(qt/'bin/qtpaths6') if (qt/'bin/qtpaths6').exists() else str(qt/'bin/qtpaths'), '--qt-version'],text=True).strip(),'bundled_libraries':sorted(copied),'external_packages':dependencies},indent=2)+'\n')
 archive=dist/(name+'.tar.gz')
 with tarfile.open(archive,'w:gz') as tf:tf.add(bundle,arcname=name)
 debroot=dist/(name+'-deb-root');(debroot/'DEBIAN').mkdir(parents=True);(debroot/'opt').mkdir()
 shutil.copytree(bundle,debroot/'opt/calc',symlinks=True)
 for d in ['usr/bin','usr/share/applications','usr/share/icons/hicolor/scalable/apps']:(debroot/d).mkdir(parents=True)
 (debroot/'usr/bin/calc').symlink_to('/opt/calc/AppRun')
-(debroot/'usr/share/applications/calc.desktop').write_text('[Desktop Entry]\nType=Application\nName=Calc\nComment=Matrix Multiplier\nExec=/opt/calc/AppRun\nIcon=io.github.HappyCatKitten.Calc\nTerminal=false\nCategories=Utility;Calculator;\nStartupWMClass=Calc\n')
+(debroot/'usr/share/applications/calc.desktop').write_text('[Desktop Entry]\nType=Application\nName=Calc\nComment=Scientific calculator\nExec=/opt/calc/AppRun\nIcon=io.github.HappyCatKitten.Calc\nTerminal=false\nCategories=Utility;Calculator;\nStartupWMClass=Calc\n')
 shutil.copy2(root/'icon.svg',debroot/'usr/share/icons/hicolor/scalable/apps/io.github.HappyCatKitten.Calc.svg')
 size=sum(p.stat().st_size for p in (debroot/'opt').rglob('*') if p.is_file())//1024
 (debroot/'DEBIAN/control').write_text(f'Package: calc\nVersion: {version}\nArchitecture: amd64\nMaintainer: HappyCatKitten <1046264+HappyCatKitten@users.noreply.github.com>\nSection: utils\nPriority: optional\nInstalled-Size: {size}\nDepends: {", ".join(dependencies)}\nHomepage: https://github.com/HappyCatKitten/Calc\nDescription: Native Rust and QML calculator\n Native arithmetic and scientific functions with a Qt/QML UI.\n')
