@@ -1,0 +1,66 @@
+MidnightOS Software: Calc Ubuntu setup, 2026-10-04
+
+Source: /home/minibox/Documents/ChatGPT/MidnightOS-Tools/Calc
+Remote: https://github.com/HappyCatKitten/Calc.git
+Revision: c29dc51c1cfe78b0602750e0ff888120e7596217 (v1.2.2)
+Initial clone was absent; fresh clone had no local changes or AGENTS.md.
+Host: Ubuntu 26.04.1 LTS, x86_64, glibc 2.43, Wayland with XWayland.
+
+Built from source using GCC 15, Cargo/Rust 1.93.1, CMake 4.2.3,
+Ninja and Ubuntu Qt 6.10.2. Noninteractive sudo is unavailable.
+Build dependencies downloaded from Ubuntu archives and extracted privately
+under downloads/build-root. No system package installation, package database
+changes or apt/dpkg lock acquisition were required. Other tool tasks can install
+system packages independently; this task performed downloads/extraction only.
+
+Compatibility fixes checked in at e27bced:
+- run.sh and scripts/package.py understand Ubuntu multiarch Qt paths.
+- Package the Qt 6.10 libqwayland.so platform plugin as well as older names.
+- Derive Qt version, host/glibc metadata and libc minimum from this build.
+- Correct desktop Comment from Matrix Multiplier to Scientific calculator.
+
+Build/retest in this checkout:
+  source downloads/build-env.sh
+  ./build.sh
+  cargo test --release --locked
+  /home/minibox/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node tests/format.test.mjs
+Package: python3 scripts/package.py (requires a fresh dist directory).
+
+Tests:
+- Source build completed; CMake QML dynamic-plugin target warnings are nonfatal.
+- Rust: 33 tests passed, covering arithmetic, parser stress, domain errors,
+  scientific functions, history, memory, undo and deferred evaluation.
+- JavaScript: 8 format checks and 5,000 campaign cases/15,000 assertions passed.
+- Installed bundle: native Wayland launch with bundled Qt verified.
+- XWayland launch verified; isolated Xvfb GUI test verified visible window,
+  128*4=512, 200+10%=220, sin(30)+sqrt(81)=9.5 and synthetic saved history.
+- desktop-file-validate passed; gio launch of desktop entry produced a running
+  isolated Calc process, then it was terminated.
+- bash syntax, Python compilation and git diff --check passed.
+Logs/helper scripts: downloads/rust-tests.log, build.log, package.log,
+installed-smoke.log, desktop-smoke.log, gui-smoke.py.
+
+Installed via project ./install.sh:
+Launcher: /home/minibox/.local/bin/calc
+Runtime: /home/minibox/.local/share/calc/versions/1.2.2/AppRun
+Desktop entry: /home/minibox/.local/share/applications/calc.desktop
+Qt runtime bundled; no dependency on the source checkout at runtime.
+Source-built .deb and tarball/checksums: dist/ (built for this Ubuntu/glibc).
+The SHA256-verified upstream release used as an initial fallback is retained
+at ~/.local/share/calc/versions/1.2.2-upstream-bundle; the active install is
+locally compiled. Source build library dependency scan had no missing libraries.
+
+No preexisting Calc install/history/preferences were found or replaced.
+Tests used temporary XDG profiles, cleaned only their own temporary files.
+No shared WhatsApp checkout changes, file associations, companion installs,
+SpaceHog cleanup, user file deletions, or Git pushes were performed.
+Calc has no screenshot feature and does not require Sector Picker.
+
+Limits: native Wayland startup was tested, but Wayland input, clipboard and
+always-on-top behavior were not verified. X11 GUI checks used Xvfb/XWayland;
+a separate real X11 desktop session was not tested. Qt 6.10 logs a portal
+registration warning in this launch environment; it did not prevent startup
+or arithmetic/history tests. No build/install blocker remains.
+
+Maintenance verification — 16 October 2026
+Rebuilt from source with the recorded private toolchain, repackaged into a fresh dist directory, and reinstalled Calc 1.2.2. Rust: 33 tests pass. Number formatting: 8 fixed checks plus 5,000 campaign cases / 15,000 assertions pass. The installed bundle passes isolated Xvfb keyboard, scientific mode, history, clipboard, deferred evaluation and error checks. Its process maps contain neither the developer Qt SDK nor downloads/build-root. The UI smoke used Pillow for private-display screenshots and an extracted xclip test utility; the application itself requires neither. Previous dist artifacts were retained for rollback. No user settings or history were used by tests.
