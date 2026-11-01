@@ -52,7 +52,7 @@ cd calc-1.2.2-linux-x86_64
 ./install.sh       # add to your app menu and ~/.local/bin
 ```
 
-The archive installer uses `~/.local/share/calc/versions/1.2.2` (or `$XDG_DATA_HOME`) and needs no root access. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
+The archive installer uses `~/.local/share/calc/versions/1.2.2` (or `$XDG_DATA_HOME`) and needs no root access. Reinstalls stage a complete bundle before replacing the version directory, retaining the previous tree for running processes and rollback. Your saved history is kept separately. Verify downloads with the release's `SHA256SUMS`.
 
 Built on Linux x86_64 with glibc 2.35. Tested on Pop!_OS 22.04/X11. The `.deb` declares its remaining system-library dependencies. Wayland plugins are bundled, but Wayland is not yet verified.
 
@@ -90,6 +90,7 @@ export QT_PREFIX=/path/to/Qt/6.8.3/gcc_64
 ./run.sh
 cargo test --release --locked
 node tests/format.test.mjs
+python3 tests/install_bundle_test.py -v  # isolated installer checks; requires cc
 python3 scripts/package.py
 ```
 
